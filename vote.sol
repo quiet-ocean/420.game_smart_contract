@@ -1,10 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity >=0.7.0 < 0.9.0;
 
-contract Voting {
+import "hardhat/console.sol";
+
+contract Vote {
   
   struct Voter {
-    mapping(uint => bool) voted; //if true, the person already voted to a question
+    mapping(uint => bool) voted; // store vote status. if true, the person already voted to a question
     address addr; //voter acount address
   }
 
@@ -28,19 +30,16 @@ contract Voting {
   // contructor
   constructor() {
 
-    administrator = msg.sender;
-
     voterCount = 0;
     questionCount = 0;
   }
   // add question with string v
   function addQuestion(string memory v) public {
 
-    require(msg.sender == administrator, "only administrator can add question.");
-    
     questions.push(Question({ value: v, upCount: 0, downCount: 0 }));
     questionCount = questionCount + 1;
 
+    console.log(questionCount);
   }
   //add a voter to voter list
   function addVoter(address _voter) public {
@@ -51,8 +50,9 @@ contract Voting {
   //
   function vote(uint id, bool value) public {
 
-    require(voters[msg.sender].voted[id] == false, "already voted");
+    require(voters[msg.sender].voted[id] == false, "already voted"); //check sender voted or not
 
+    //if the person didn't vote, vote and make the voted status to true
     if(value) {
         questions[id].upCount ++; 
     } else {
@@ -60,6 +60,7 @@ contract Voting {
     }
 
     voters[msg.sender].voted[id] = true;
+
     emit Voted(msg.sender, id, value);
   }
 
@@ -83,7 +84,7 @@ contract Voting {
 
   function getQuestions() public returns(string[] memory) {
     
-    require(questionCount > 0, "not question exist");
+    require(questionCount > 0, "not question exist"); // check question list is null or not
 
     string[] memory list = new string[](questionCount);
 
