@@ -6,8 +6,8 @@ import "hardhat/console.sol";
 contract Ballot {
   
   struct Voter {
-    mapping(uint => bool) voted; // store vote status. if true, the person already voted to a question
-    address addr; //voter acount address
+    mapping(uint => bool) voted; // store vote status. if true, the person is already voted to a question
+    address addr; //voter account address
   }
 
   struct Question {
