@@ -48,7 +48,7 @@ contract Ballot {
     voterCount ++;
   }
   //
-  function vote(uint id, bool value) public payable {
+  function vote(uint id, bool value) public {
 
     require(voters[msg.sender].voted[id] == false, "already voted"); //check sender voted or not
 
