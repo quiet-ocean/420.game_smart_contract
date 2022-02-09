@@ -6,33 +6,34 @@ import "hardhat/console.sol";
 contract Ballot {
   
   struct Voter {
-    mapping(uint => bool) voted;
-    address addr;
+    mapping(uint => bool) voted; //if true, the person already voted to a question
+    address addr; //voter acount address
   }
 
   struct Question {
-    string value;
-    uint upCount;
-    uint downCount;
+    string value; // question string
+    uint upCount; // approve count
+    uint downCount; // opposite count
   }
 
-  uint256 public voterCount;
-  uint public questionCount;
+  uint256 public voterCount; // number of voters
+  uint public questionCount; // number of questions
 
-  address public administrator;
+  address public administrator; // address of administrator
 
-  mapping(address => Voter) public voters;
+  mapping(address => Voter) public voters; // voters map
 
-  Question[] public questions;
+  Question[] public questions; // question string
   
-  event Voted(address voter, uint256 to, bool value);
+  event Voted(address voter, uint256 to, bool value); // event for vote logging
 
+  // contructor
   constructor() {
 
     voterCount = 0;
     questionCount = 0;
   }
-
+  // add question with string v
   function addQuestion(string memory v) public {
 
     questions.push(Question({ value: v, upCount: 0, downCount: 0 }));
@@ -40,19 +41,19 @@ contract Ballot {
 
     console.log(questionCount);
   }
-
+  //add a voter to voter list
   function addVoter(address _voter) public {
 
     voters[_voter].addr = _voter;
     voterCount ++;
   }
-
+  //
   function vote(uint id, bool value) public payable {
 
     require(voters[msg.sender].voted[id] == false, "already voted");
 
     if(value) {
-        questions[id].upCount ++;
+        questions[id].upCount ++; 
     } else {
         questions[id].downCount ++;
     }
