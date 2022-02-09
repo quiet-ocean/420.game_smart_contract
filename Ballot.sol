@@ -6,7 +6,7 @@ import "hardhat/console.sol";
 contract Ballot {
   
   struct Voter {
-    mapping(uint => bool) voted; //if true, the person already voted to a question
+    mapping(uint => bool) voted; // store vote status. if true, the person already voted to a question
     address addr; //voter acount address
   }
 
@@ -50,8 +50,9 @@ contract Ballot {
   //
   function vote(uint id, bool value) public payable {
 
-    require(voters[msg.sender].voted[id] == false, "already voted");
+    require(voters[msg.sender].voted[id] == false, "already voted"); //check sender voted or not
 
+    //if the person didn't vote, vote and make the voted status to true
     if(value) {
         questions[id].upCount ++; 
     } else {
@@ -59,6 +60,7 @@ contract Ballot {
     }
 
     voters[msg.sender].voted[id] = true;
+
     emit Voted(msg.sender, id, value);
   }
 
@@ -82,7 +84,7 @@ contract Ballot {
 
   function getQuestions() public returns(string[] memory) {
     
-    require(questionCount > 0, "not question exist");
+    require(questionCount > 0, "not question exist"); // check question list is null or not
 
     string[] memory list = new string[](questionCount);
 
