@@ -3,7 +3,7 @@ pragma solidity >=0.7.0 < 0.9.0;
 
 import "hardhat/console.sol";
 
-contract Ballot {
+contract Vote {
   
   struct Voter {
     mapping(uint => bool) voted; // store vote status. if true, the person already voted to a question
@@ -48,7 +48,7 @@ contract Ballot {
     voterCount ++;
   }
   //
-  function vote(uint id, bool value) public payable {
+  function vote(uint id, bool value) public {
 
     require(voters[msg.sender].voted[id] == false, "already voted"); //check sender voted or not
 
