@@ -1,7 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity >=0.7.0 < 0.9.0;
 
-contract Voting {
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "hardhat/console.sol";
+
+contract Voting is Ownable {
   
   struct Voter {
     mapping(uint => bool) voted; //if true, the person already voted to a question
@@ -9,19 +12,21 @@ contract Voting {
   }
 
   struct Question {
+    uint id;
     string value; // question string
     uint upCount; // approve count
     uint downCount; // opposite count
   }
 
-  uint256 public voterCount; // number of voters
+  uint public voterCount; // number of voters
   uint public questionCount; // number of questions
+  uint private currentId; // id of last question
 
   address public administrator; // address of administrator
 
   mapping(address => Voter) public voters; // voters map
 
-  Question[] public questions; // question string
+  mapping(uint => Question) public questions; // question string
   
   event Voted(address voter, uint256 to, bool value); // event for vote logging
 
@@ -30,17 +35,32 @@ contract Voting {
 
     administrator = msg.sender;
 
-    voterCount = 0;
-    questionCount = 0;
+    voterCount = questionCount = currentId = 0;
   }
   // add question with string v
   function addQuestion(string memory v) public {
 
     require(msg.sender == administrator, "only administrator can add question.");
     
-    questions.push(Question({ value: v, upCount: 0, downCount: 0 }));
-    questionCount = questionCount + 1;
+    Question memory q = Question({ id: currentId + 1, value: v, upCount: 0, downCount: 0 });
+    questions[currentId] = q;
 
+    questionCount = questionCount + 1;
+    currentId = currentId + 1;
+  }
+  function updateQuestion(uint id) public {
+
+  }
+  function removeQuestion(uint id) public returns(bool) {
+    
+    Question memory q = questions[id];
+    
+    if(q.id == id) {
+      delete questions[id];
+      questionCount = questionCount - 1;
+      return true;
+    }
+    return false;
   }
   //add a voter to voter list
   function addVoter(address _voter) public {
@@ -50,15 +70,16 @@ contract Voting {
   }
   //
   function vote(uint id, bool value) public {
-
+    console.log(id);
+    console.log(value);
     require(voters[msg.sender].voted[id] == false, "already voted");
 
     if(value) {
-        questions[id].upCount ++; 
+        questions[id].upCount = questions[id].upCount + 1;
     } else {
-        questions[id].downCount ++;
+        questions[id].downCount = questions[id].downCount - 1;
     }
-
+    console.log(questions[id].upCount);
     voters[msg.sender].voted[id] = true;
     emit Voted(msg.sender, id, value);
   }
@@ -80,15 +101,14 @@ contract Voting {
     // }
     // winningQuestion_ = p;
   }
-
-  function getQuestions() public returns(string[] memory) {
+  
+  function getQuestions() public view returns(Question[] memory) {
     
     require(questionCount > 0, "not question exist");
 
-    string[] memory list = new string[](questionCount);
-
-    for(uint i = 0; i < questionCount; i++) {
-      list[i] = questions[i].value;
+    Question[] memory list = new Question[](currentId);
+    for(uint i = 0; i < currentId; i++) {
+      list[i] = questions[i];
     }
     return list;
   }
