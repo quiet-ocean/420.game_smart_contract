@@ -42,7 +42,7 @@ contract Voting is Ownable {
 
     require(msg.sender == administrator, "only administrator can add question.");
     
-    Question memory q = Question({ id: currentId + 1, value: v, upCount: 0, downCount: 0 });
+    Question memory q = Question({ id: currentId, value: v, upCount: 0, downCount: 0 });
     questions[currentId] = q;
 
     questionCount = questionCount + 1;
@@ -54,6 +54,9 @@ contract Voting is Ownable {
   function removeQuestion(uint id) public returns(bool) {
     
     Question memory q = questions[id];
+
+    console.log(id);
+    console.log(q.id);
     
     if(q.id == id) {
       delete questions[id];
@@ -77,7 +80,7 @@ contract Voting is Ownable {
     if(value) {
         questions[id].upCount = questions[id].upCount + 1;
     } else {
-        questions[id].downCount = questions[id].downCount - 1;
+        questions[id].downCount = questions[id].downCount + 1;
     }
     console.log(questions[id].upCount);
     voters[msg.sender].voted[id] = true;
