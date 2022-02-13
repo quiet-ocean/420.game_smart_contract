@@ -29,6 +29,9 @@ contract Voting is Ownable {
   mapping(uint => Question) public questions; // question string
   
   event Voted(address voter, uint256 to, bool value); // event for vote logging
+  event AddedQuestion(uint id); // event when a question added
+  event UpdatedQuestion(uint id); // event when a question updated
+  event RemovedQuestion(uint id); // event when a question removed
 
   // contructor
   constructor() {
@@ -47,16 +50,22 @@ contract Voting is Ownable {
 
     questionCount = questionCount + 1;
     currentId = currentId + 1;
-  }
-  function updateQuestion(uint id) public {
 
+    emit AddedQuestion(q.id);
   }
-  function removeQuestion(uint id) public returns(bool) {
+  function updateQuestion(uint id, string memory value) public returns(bool){
     
     Question memory q = questions[id];
 
-    console.log(id);
-    console.log(q.id);
+    if(q.id == id) {
+      q.value = value;
+      return true;
+    }
+    return false;
+  }
+  function deleteQuestion(uint id) public returns(bool) {
+    
+    Question memory q = questions[id];
     
     if(q.id == id) {
       delete questions[id];
@@ -73,8 +82,6 @@ contract Voting is Ownable {
   }
   //
   function vote(uint id, bool value) public {
-    console.log(id);
-    console.log(value);
     require(voters[msg.sender].voted[id] == false, "already voted");
 
     if(value) {
@@ -82,7 +89,6 @@ contract Voting is Ownable {
     } else {
         questions[id].downCount = questions[id].downCount + 1;
     }
-    console.log(questions[id].upCount);
     voters[msg.sender].voted[id] = true;
     emit Voted(msg.sender, id, value);
   }
