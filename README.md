@@ -8,3 +8,5 @@ https://www.420.game/
 
 ## Game Site
 https://play.420.game/
+
+## Explanation
